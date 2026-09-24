@@ -1,4 +1,15 @@
+using CatLens.Web.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+var connectionString =
+    builder.Configuration.GetConnectionString("CatLensDatabase")
+    ?? throw new InvalidOperationException(
+        "Connection string 'CatLensDatabase' was not found.");
+
+builder.Services.AddDbContext<CatLensDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
