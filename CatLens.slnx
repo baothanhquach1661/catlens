@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CatLens.Web/CatLens.Web.csproj" />
+  </Folder>
+</Solution>
