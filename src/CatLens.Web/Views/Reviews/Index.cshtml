@@ -21,21 +21,30 @@
     </p>
 </div>
 
-<div class="btn-group mb-4" role="group">
-    <a class="btn btn-primary" asp-action="Index">
-        Missing SKU
-    </a>
 
-    <a class="btn btn-outline-secondary" asp-action="DuplicateSkus">
-        Duplicate SKU
-    </a>
     
-    <a class="btn btn-outline-secondary" asp-action="HighInventory">
-        High Inventory
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div class="btn-group shadow-sm" role="group" aria-label="Review rules">
+
+        <a asp-controller="Reviews" asp-action="Index" class="btn btn-primary px-3">
+            Missing SKU
+        </a>
+
+        <a asp-controller="Reviews" asp-action="DuplicateSkus" class="btn btn-outline-secondary px-3">
+            Duplicate SKU
+        </a>
+
+        <a asp-controller="Reviews" asp-action="HighInventory" class="btn btn-outline-secondary px-3">
+            High Inventory
+        </a>
+    </div>
+
+    <a asp-controller="Reviews" asp-action="ExportMissingSkus" class="btn btn-outline-success px-3 shadow-sm">
+        ↓ Export Missing SKU CSV
     </a>
 </div>
 
-<div class="alert alert-warning" role="alert">
+<div class="alert alert-warning border-0 shadow-sm rounded-3 mb-4">
     <div class="fw-semibold">
         Rule 1: Missing SKU
     </div>
@@ -46,7 +55,7 @@
     </div>
 </div>
 
-<div class="card shadow-sm">
+<div class="card border-0 shadow-sm rounded-3 overflow-hidden">
     <div class="card-header bg-white">
         <div class="d-flex flex-wrap
             justify-content-between

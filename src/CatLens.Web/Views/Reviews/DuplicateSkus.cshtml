@@ -13,17 +13,24 @@
     </p>
 </div>
 
-<div class="btn-group mb-4" role="group">
-    <a class="btn btn-outline-secondary" asp-action="Index">
-        Missing SKU
-    </a>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div class="btn-group shadow-sm" role="group" aria-label="Review rules">
 
-    <a class="btn btn-primary" asp-action="DuplicateSkus">
-        Duplicate SKU
-    </a>
-    
-    <a class="btn btn-outline-secondary" asp-action="HighInventory">
-        High Inventory
+        <a asp-action="Index" class="btn btn-outline-secondary px-3">
+            Missing SKU
+        </a>
+
+        <a asp-action="DuplicateSkus" class="btn btn-primary px-3">
+            Duplicate SKU
+        </a>
+
+        <a asp-action="HighInventory" class="btn btn-outline-secondary px-3">
+            High Inventory
+        </a>
+    </div>
+
+    <a asp-action="ExportDuplicateSkus" class="btn btn-outline-success px-3 shadow-sm">
+        ↓ Export Duplicate SKU CSV
     </a>
 </div>
 
