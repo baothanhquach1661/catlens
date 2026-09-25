@@ -1,5 +1,6 @@
 using CatLens.Web.Data;
 using Microsoft.EntityFrameworkCore;
+using CatLens.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ var connectionString =
 
 builder.Services.AddDbContext<CatLensDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+builder.Services.AddScoped<InventoryImportService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

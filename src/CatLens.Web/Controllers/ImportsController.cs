@@ -1,12 +1,20 @@
-using System.Globalization;
-using CatLens.Web.Models.Import;
+using CatLens.Web.Services;
 using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CatLens.Web.Controllers;
 
 public class ImportsController : Controller
 {
+    private readonly InventoryImportService _importService;
+
+    public ImportsController(
+        InventoryImportService importService)
+    {
+        _importService = importService;
+    }
+
     [HttpGet]
     public IActionResult Index()
     {
@@ -15,7 +23,9 @@ public class ImportsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Index(IFormFile? inventoryFile)
+    public async Task<IActionResult> Index(
+        IFormFile? inventoryFile,
+        CancellationToken cancellationToken)
     {
         if (inventoryFile is null || inventoryFile.Length == 0)
         {
@@ -40,25 +50,19 @@ public class ImportsController : Controller
 
         try
         {
-            await using var stream = inventoryFile.OpenReadStream();
-            using var reader = new StreamReader(stream);
-            using var csv = new CsvReader(
-                reader,
-                CultureInfo.InvariantCulture);
+            await using var stream =
+                inventoryFile.OpenReadStream();
 
-            csv.Context.RegisterClassMap<InventoryCsvRowMap>();
-
-            var rowCount = 0;
-
-            await foreach (
-                var row in csv.GetRecordsAsync<InventoryCsvRow>())
-            {
-                rowCount++;
-            }
+            var result = await _importService.ImportAsync(
+                stream,
+                cancellationToken);
 
             TempData["UploadMessage"] =
-                $"Successfully read {rowCount:N0} CSV rows " +
-                $"from {inventoryFile.FileName}.";
+                $"Import completed: " +
+                $"{result.CsvRowCount:N0} CSV rows, " +
+                $"{result.VariantCount:N0} variants, " +
+                $"{result.InventoryLevelCount:N0} inventory levels, " +
+                $"{result.NotStockedCount:N0} not stocked.";
         }
         catch (CsvHelperException)
         {
@@ -66,6 +70,23 @@ public class ImportsController : Controller
                 string.Empty,
                 "CatLens could not read this CSV. " +
                 "Please check that it is a Shopify inventory export.");
+
+            return View();
+        }
+        catch (InvalidDataException exception)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                exception.Message);
+
+            return View();
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "The CSV was valid, but CatLens could not save " +
+                "the inventory to the database.");
 
             return View();
         }
