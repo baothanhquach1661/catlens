@@ -1,0 +1,72 @@
+@{
+    ViewData["Title"] = "Import Inventory";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="mb-4">
+            <h1 class="display-5">Import Inventory CSV</h1>
+
+            <p class="text-muted">
+                Upload an inventory export from Shopify to analyze variants,
+                SKUs, and inventory by location.
+            </p>
+        </div>
+
+        @if (TempData["UploadMessage"] is string message)
+        {
+            <div class="alert alert-success" role="alert">
+                @message
+            </div>
+        }
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div asp-validation-summary="All" class="alert alert-danger" role="alert">
+            </div>
+        }
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h2 class="h4 card-title">Select CSV file</h2>
+
+                <form asp-controller="Imports" asp-action="Index" method="post" enctype="multipart/form-data">
+
+                    <div class="mb-3">
+                        <label for="inventoryFile" class="form-label">
+                            Shopify inventory CSV
+                        </label>
+
+                        <input id="inventoryFile" name="inventoryFile" type="file" accept=".csv,text/csv"
+                               class="form-control" />
+
+                        <div class="form-text">
+                            The existing snapshot will only be replaced after
+                            the entire file is imported successfully.
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        Import CSV
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="h4 card-title">
+                    Checks performed by CatLens
+                </h2>
+
+                <ul class="mb-0">
+                    <li>Variants with a missing SKU</li>
+                    <li>SKUs used by different variants</li>
+                    <li>
+                        Inventory above the configured threshold at one location
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
