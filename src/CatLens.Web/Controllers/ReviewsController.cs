@@ -2,18 +2,28 @@ using CatLens.Web.Data;
 using CatLens.Web.Models.Reviews;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using CatLens.Web.Configuration;
+using Microsoft.Extensions.Options;
+
+
 
 namespace CatLens.Web.Controllers;
 
 public class ReviewsController : Controller
 {
+    private readonly int _highInventoryThreshold;
     private const int PageSize = 50;
 
     private readonly CatLensDbContext _dbContext;
 
-    public ReviewsController(CatLensDbContext dbContext)
+    public ReviewsController(
+    CatLensDbContext dbContext,
+    IOptions<CatalogReviewOptions> reviewOptions)
     {
         _dbContext = dbContext;
+
+        _highInventoryThreshold =
+            reviewOptions.Value.HighInventoryThreshold;
     }
 
     [HttpGet]
@@ -143,6 +153,73 @@ public class ReviewsController : Controller
         {
             DuplicateVariantCount = duplicateRows.Count,
             Groups = groups
+        };
+
+        return View(model);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> HighInventory(
+    int page = 1,
+    CancellationToken cancellationToken = default)
+    {
+        page = Math.Max(page, 1);
+
+        var highInventoryQuery = _dbContext.InventoryLevels
+            .AsNoTracking()
+            .Where(level =>
+                level.OnHandQuantity.HasValue &&
+                level.OnHandQuantity.Value >
+                    _highInventoryThreshold);
+
+        var warningCount =
+            await highInventoryQuery.CountAsync(
+                cancellationToken);
+
+        var totalPages = Math.Max(
+            1,
+            (int)Math.Ceiling(
+                warningCount / (double)PageSize));
+
+        page = Math.Min(page, totalPages);
+
+        var rows = await highInventoryQuery
+            .OrderByDescending(level =>
+                level.OnHandQuantity)
+            .ThenBy(level => level.Location)
+            .ThenBy(level => level.Variant.Title)
+            .Skip((page - 1) * PageSize)
+            .Take(PageSize)
+            .Select(level => new HighInventoryRowViewModel
+            {
+                Handle = level.Variant.Handle,
+                Title = level.Variant.Title,
+
+                Option1Value =
+                    level.Variant.Option1Value,
+
+                Option2Value =
+                    level.Variant.Option2Value,
+
+                Option3Value =
+                    level.Variant.Option3Value,
+
+                Sku = level.Variant.Sku,
+                Location = level.Location,
+
+                OnHandQuantity =
+                    level.OnHandQuantity.Value
+            })
+            .ToListAsync(cancellationToken);
+
+        var model = new HighInventoryReviewViewModel
+        {
+            Threshold = _highInventoryThreshold,
+            WarningCount = warningCount,
+            CurrentPage = page,
+            PageSize = PageSize,
+            TotalPages = totalPages,
+            Rows = rows
         };
 
         return View(model);
