@@ -1,0 +1,163 @@
+@model CatLens.Web.Models.Reviews.DuplicateSkuReviewViewModel
+
+@{
+    ViewData["Title"] = "Duplicate SKU Review";
+}
+
+<div class="mb-4">
+    <h1 class="display-5">Data Review</h1>
+
+    <p class="text-muted">
+        Variants that may need manual verification.
+        CatLens does not change Shopify data.
+    </p>
+</div>
+
+<div class="btn-group mb-4" role="group">
+    <a class="btn btn-outline-secondary" asp-action="Index">
+        Missing SKU
+    </a>
+
+    <a class="btn btn-primary" asp-action="DuplicateSkus">
+        Duplicate SKU
+    </a>
+</div>
+
+<div class="alert alert-danger" role="alert">
+    <div class="fw-semibold">
+        Rule 2: Duplicate SKU
+    </div>
+
+    <div>
+        A SKU is included when the same non-blank value
+        is used by more than one variant. Comparison is
+        case-insensitive.
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted">
+                    Duplicate SKU groups
+                </div>
+
+                <div class="fs-2 fw-semibold text-danger">
+                    @Model.DuplicateSkuGroupCount.ToString("N0")
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted">
+                    Affected variants
+                </div>
+
+                <div class="fs-2 fw-semibold text-danger">
+                    @Model.DuplicateVariantCount.ToString("N0")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.Groups.Count == 0)
+{
+    <div class="alert alert-success">
+        No duplicate SKUs were found.
+    </div>
+}
+else
+{
+    @foreach (var group in Model.Groups)
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <div class="d-flex
+                    justify-content-between
+                    align-items-center">
+
+                    <div>
+                        SKU:
+                        <code class="fs-6">@group.Sku</code>
+                    </div>
+
+                    <span class="badge text-bg-danger">
+                        @group.Variants.Count variants
+                    </span>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table
+                    table-hover
+                    align-middle
+                    mb-0">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Variant</th>
+                            <th>Locations</th>
+                            <th class="text-end">
+                                Total on hand
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var variant in group.Variants)
+                        {
+                            var options = new[]
+                            {
+                                variant.Option1Value,
+                                variant.Option2Value,
+                                variant.Option3Value
+                            }
+                            .Where(value =>
+                                !string.IsNullOrWhiteSpace(value))
+                            .ToArray();
+
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">
+                                        @variant.Title
+                                    </div>
+
+                                    <small class="text-muted">
+                                        @variant.Handle
+                                    </small>
+                                </td>
+
+                                <td>
+                                    @if (options.Length == 0)
+                                    {
+                                        <span class="text-muted">
+                                            Default
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        @string.Join(" / ", options)
+                                    }
+                                </td>
+
+                                <td>
+                                    @variant.LocationCount
+                                </td>
+
+                                <td class="text-end fw-semibold">
+                                    @variant.TotalOnHand.ToString("N0")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}

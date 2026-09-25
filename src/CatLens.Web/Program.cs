@@ -1,6 +1,7 @@
 using CatLens.Web.Data;
 using Microsoft.EntityFrameworkCore;
 using CatLens.Web.Services;
+using CatLens.Web.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,16 @@ builder.Services.AddDbContext<CatLensDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 builder.Services.AddScoped<InventoryImportService>();
+
+builder.Services
+    .AddOptions<CatalogReviewOptions>()
+    .Bind(
+        builder.Configuration.GetSection(
+            CatalogReviewOptions.SectionName))
+    .Validate(
+        options => options.HighInventoryThreshold >= 0,
+        "High inventory threshold cannot be negative.")
+    .ValidateOnStart();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
