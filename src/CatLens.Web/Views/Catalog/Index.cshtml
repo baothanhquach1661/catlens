@@ -1,0 +1,150 @@
+@model CatLens.Web.Models.Catalog.CatalogIndexViewModel
+
+@{
+    ViewData["Title"] = "Catalog";
+}
+
+<div class="mb-4">
+    <h1 class="display-5">Catalog</h1>
+
+    <p class="text-muted">
+        Inventory variants imported from the latest Shopify CSV.
+    </p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted">Variants</div>
+
+                <div class="fs-2 fw-semibold">
+                    @Model.TotalVariants.ToString("N0")
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted">Inventory levels</div>
+
+                <div class="fs-2 fw-semibold">
+                    @Model.TotalInventoryLevels.ToString("N0")
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-warning">
+            <div class="card-body">
+                <div class="text-muted">Missing SKU</div>
+
+                <div class="fs-2 fw-semibold text-warning">
+                    @Model.MissingSkuVariants.ToString("N0")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white">
+        <div class="d-flex justify-content-between">
+            <span class="fw-semibold">Imported variants</span>
+
+            <span class="text-muted">
+                Showing first @Model.Variants.Count
+            </span>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Product</th>
+                    <th>Variant</th>
+                    <th>SKU</th>
+                    <th>Locations</th>
+                    <th class="text-end">Total on hand</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var variant in Model.Variants)
+                {
+                    var options = new[]
+                    {
+                        variant.Option1Value,
+                        variant.Option2Value,
+                        variant.Option3Value
+                    }
+                    .Where(value =>
+                        !string.IsNullOrWhiteSpace(value))
+                    .ToArray();
+
+                    <tr>
+                        <td>
+                            <div class="fw-semibold">
+                                @variant.Title
+                            </div>
+
+                            <small class="text-muted">
+                                @variant.Handle
+                            </small>
+                        </td>
+
+                        <td>
+                            @if (options.Length == 0)
+                            {
+                                <span class="text-muted">
+                                    Default
+                                </span>
+                            }
+                            else
+                            {
+                                @string.Join(" / ", options)
+                            }
+                        </td>
+
+                        <td>
+                            @if (string.IsNullOrWhiteSpace(
+                                variant.Sku))
+                            {
+                                <span class="badge text-bg-warning">
+                                    Missing
+                                </span>
+                            }
+                            else
+                            {
+                                <code>@variant.Sku</code>
+                            }
+                        </td>
+
+                        <td>
+                            @variant.StockedLocationCount
+                            /
+                            @variant.LocationCount stocked
+                        </td>
+
+                        <td class="text-end fw-semibold">
+                            @variant.TotalOnHand.ToString("N0")
+                        </td>
+                    </tr>
+                }
+
+                @if (Model.Variants.Count == 0)
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            No imported variants were found.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
