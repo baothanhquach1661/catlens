@@ -1,8 +1,147 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="py-5">
+    <div class="row align-items-center g-5 mb-5">
+        <div class="col-lg-7">
+            <span class="badge rounded-pill text-bg-primary mb-3">
+                Catalog & Inventory Review
+            </span>
+
+            <h1 class="display-4 fw-semibold mb-3">
+                Find catalog issues before they become
+                operational problems.
+            </h1>
+
+            <p class="lead text-secondary mb-4">
+                Import a Shopify inventory CSV, review variants
+                that may need attention, and export clear reports
+                for manual verification.
+            </p>
+
+            <div class="d-flex flex-wrap gap-2">
+                <a asp-controller="Imports" asp-action="Index" class="btn btn-primary btn-lg px-4">
+                    Import Inventory CSV
+                </a>
+
+                <a asp-controller="Reviews" asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
+                    Open Data Review
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <h2 class="h5 fw-semibold mb-3">
+                        V1 review rules
+                    </h2>
+
+                    <div class="d-flex gap-3 mb-3">
+                        <span class="badge text-bg-warning align-self-start">
+                            1
+                        </span>
+
+                        <div>
+                            <div class="fw-semibold">Missing SKU</div>
+                            <div class="text-secondary small">
+                                Find variants without an assigned SKU.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3 mb-3">
+                        <span class="badge text-bg-warning align-self-start">
+                            2
+                        </span>
+
+                        <div>
+                            <div class="fw-semibold">Duplicate SKU</div>
+                            <div class="text-secondary small">
+                                Find SKUs used by multiple variants.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <span class="badge text-bg-warning align-self-start">
+                            3
+                        </span>
+
+                        <div>
+                            <div class="fw-semibold">
+                                High inventory
+                            </div>
+
+                            <div class="text-secondary small">
+                                Flag inventory above the configured
+                                warning threshold.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <div class="text-primary fw-semibold mb-2">
+                        Step 1
+                    </div>
+
+                    <h2 class="h4">Import</h2>
+
+                    <p class="text-secondary mb-0">
+                        Upload the current Shopify inventory CSV
+                        into the CatLens PostgreSQL snapshot.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <div class="text-primary fw-semibold mb-2">
+                        Step 2
+                    </div>
+
+                    <h2 class="h4">Review</h2>
+
+                    <p class="text-secondary mb-0">
+                        Inspect missing SKUs, duplicate SKUs, and
+                        unusual inventory by location.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <div class="text-primary fw-semibold mb-2">
+                        Step 3
+                    </div>
+
+                    <h2 class="h4">Export</h2>
+
+                    <p class="text-secondary mb-0">
+                        Download CSV reports for staff to verify
+                        and resolve manually.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-light border rounded-3">
+        <strong>Read-only workflow:</strong>
+        CatLens does not modify products or inventory in Shopify.
+        High inventory is a warning for human verification, not a
+        conclusion that the data is incorrect.
+    </div>
 </div>
